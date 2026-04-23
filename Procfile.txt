@@ -1,0 +1,142 @@
+ my-chatbot/
+│
+├── app.py
+├── requirements.txt
+└── ProcfiLE
+ from flask import Flask, request, jsonify, render_template_string
+from openai import OpenAI
+import os
+
+app = Flask(_name_)
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chatbot</title>
+</head>
+<body>
+    <h2>💬 My AI Chatbot</h2>
+    <input id="msg" placeholder="Type message..." />
+    <button onclick="send()">Send</button>
+
+    <div id="chat"></div>
+
+<script>
+async function send(){
+    let msg = document.getElementById("msg").value;
+
+    let res = await fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({message: msg})
+    });
+
+    let data = await res.json();
+
+    document.getElementById("chat").innerHTML += "<p><b>You:</B>" + msg + "</p>";
+    document.getElementById("chat").innerHTML += "<p><b>AI:</b> " + data.reply + "</p>";
+}
+</script>
+
+</body>
+</html>
+"""
+
+@app.route("/")
+def home():
+    return render_template_string(HTML)
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_msg = request.json["message"]
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": user_msg}
+        ]
+    )
+
+    return jsonify({"reply": response.choices[0].message.content})
+
+if _name_ == "_main_":
+    app.run()
+ flask
+openai
+gunicorn
+ Procfile
+ web: gunicorn app:app
+ pip install -r requirements.txt
+ gunicorn app:app
+OPENAI_API_KEY = your_api_key_here
+app.py
+requirements.txt
+Procfile
+from flask import Flask, request, jsonify, render_template_string
+from openai import OpenAI
+import os
+
+app = Flask(_name_)
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+HTML = """
+<!DOCTYPE html>
+<html>
+<body>
+<h2>AI Chatbot</h2>
+<input id="msg">
+<button onclick="send()">Send</button>
+<div id="chat"></div>
+
+<script>
+async function send(){
+let msg=document.getElementById("msg").value;
+
+let res=await fetch("/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:msg})
+});
+
+let data=await res.json();
+
+document.getElementById("chat").innerHTML += "<p>You: "+msg+"</p>";
+document.getElementById("chat").innerHTML += "<p>AI: "+data.reply+"</p>";
+}
+</script>
+
+</body>
+</html>
+"""
+
+@app.route("/")
+def home():
+    return render_template_string(HTML)
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_msg = request.json["message"]
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role":"system","content":"You are helpful."},
+            {"role":"user","content":user_msg}
+        ]
+    )
+
+    return jsonify({"reply": response.choices[0].message.content})
+
+if _name_ == "_main_":
+    app.run()
+ flask
+openai
+gunicorn
+ web: gunicorn app:app
+pip install -r requirements.txt
+gunicorn app:app
